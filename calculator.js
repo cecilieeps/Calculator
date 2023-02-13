@@ -1,6 +1,20 @@
 // loop over all nodes in the buttons class and add an event
 const buttons = document.querySelectorAll('.buttons');
-const display = document.querySelector('.display');
+let display = 0;
+let operator;
+let a = 0; // the value the calculator starts with
+let b;
+
+const operators = document.querySelectorAll('.operator');
+// every time an operator button is clicked, update operator variable
+// and 
+
+
+operators.forEach(op => {
+    addEventListener('click', () => {
+
+    });
+});
 // const operatorSelected 
 
 

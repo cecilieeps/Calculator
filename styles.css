@@ -1,13 +1,29 @@
-.buttons-container {
+.display {
+    margin: 5px 5px;
     display: flex;
-    flex-wrap: wrap;
-    max-width: 200px;
+    border: 2px solid black;
+    border-radius: 15px;
+    font-size: 30px;
+    height: 50px;
+    align-items: center;
+    justify-content: flex-end;
 }
 
-.buttons-container > button {
-    font-size: 14px;
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 250px;
+    flex-wrap: wrap;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.button-row > * {
+    height: 50px;
+    width: 50px;
     margin: 5px 5px;
-    padding: 10px;
-    width: 40px;
-    height: 40px;
 }
