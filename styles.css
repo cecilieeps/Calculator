@@ -1,12 +1,21 @@
 .display {
     margin: 5px 5px;
     display: flex;
-    border: 2px solid black;
+    flex-direction: column;
+    border: 1px solid rgb(170, 127, 222);
     border-radius: 15px;
-    font-size: 30px;
     height: 50px;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
+    padding: 5px;
+}
+
+.small-display {
+    font-size: 16px;
+}
+
+.main-display {
+    font-size: 30px;
 }
 
 .container {
