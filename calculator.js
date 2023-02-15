@@ -1,43 +1,71 @@
 let operator;
-let a; 
-let b;
+let equalsSelected;
 let result;
+let operands = {
+    a : '',
+    b : '',
+}
 
 const operators = document.querySelectorAll('.operator');
 const numbers = document.querySelectorAll('.number');
 const smallDisplay = document.querySelector('.small-display');
 const mainDisplay = document.querySelector('.main-display');
 const equals = document.querySelector('.equals');
+const clearButton = document.querySelector('.clear');
+const delButton = document.querySelector('.delete');
+
+clearButton.addEventListener('click', () => {
+    mainDisplay.textContent = '';
+    smallDisplay.textContent = '';
+    operands.a = '';
+    operands.b = '';
+});
 
 equals.addEventListener('click', () => {
-    if (a && b && operator) {
+    if (operands.a && operands.b && operator) {
+        smallDisplay.textContent += operands.b;
         smallDisplay.textContent += '=';
-        result = operate(operator, a, b); // sets operator to ''
+        result = operate(operator, operands.a, operands.b);
         mainDisplay.textContent = result;
-        console.log(mainDisplay.textContent);
-        console.log("equals");
-        // now update a to be the result of the above operation
     }
-    a = result;
-    b = '';
+    equalsSelected = true;
+    operands.a = result;
+    operands.b = '';
 });
 
 operators.forEach(o => {
     o.addEventListener('click', () => {
-        operator = o.textContent;
-        if (a && !b) {
-            smallDisplay.textContent += operator;
+        let newOperator = o.textContent;
+        if (operator) {
+            // if a and b are both assigned values and an operator is already selected,
+            // then calculate the new value for a user operate() and initialize b. 
+            if (operands.a && operands.b) {
+                operands.a = operate(operator, operands.a, operands.b); // operator initialized
+                operands.b = '';
+                smallDisplay.textContent = operands.a;
+                mainDisplay.textContent = operands.a;
+                smallDisplay.textContent += newOperator;
+                operator = newOperator;
+            }
+            // a result has been returned using equals, and the user wants to use the result
+            // in the next calculation. 
+            else if (operands.a && !operands.b && equalsSelected) {
+                smallDisplay.textContent = operands.a;
+                mainDisplay.textContent = operands.a;
+                smallDisplay.textContent += newOperator;
+                operator = newOperator;
+            }
         }
-        if (a && b) {
-            console.log(a);
-            console.log(b);
-            /* if a and b both have values assigned and an operator has been clicked on
-            we need to update the operator value and perform operation on a, b.
-            Change the small display value and the main value to the result and add the new operator to the new value.
-            */
-            smallDisplay.textContent = operate(a, b, operator);
-            mainDisplay.textContent = operate(a, b, operator);
+        else if (!operator) {
+            operator = newOperator;
+            if (operands.a && equalsSelected) {
+                smallDisplay.textContent = operands.a + operator;
+            }
+            else if (operands.a && !operands.b) {
+                smallDisplay.textContent += operator;
+            }
         }
+        equalsSelected = false;
     });
 });
 
@@ -47,31 +75,32 @@ function updateDisplay(x) {
 
 numbers.forEach(number => {
     number.addEventListener('click', () => {
-        /* a number has been clicked on. Check if a has a value, update it with the number thats been clicked on if it doesnt.
-        */
-        if (!a) {
-            a = number.textContent;
+        // a is an empty string meaning a hasn't been selected yet
+        if (!operands.a) {
+            operands.a = number.textContent;
             mainDisplay.textContent = number.textContent;
             smallDisplay.textContent = number.textContent;
         }
-        else if (!b) {
-            preceedingValue = a;
-            b = number.textContent;
-            mainDisplay.textContent = number.textContent;
+        // A one-digit value has been selected for a but an operator has not
+        // yet been chosen. Add another number (as string) to the value of a.
+        else if (operands.a && !operator) {
+            operands.a += number.textContent;
+            mainDisplay.textContent += number.textContent;
             smallDisplay.textContent += number.textContent;
         }
-        else {
-            /*
-            If another operator is clicked on while a, b have values
-            then automatically do the operation on a, b and then update
-            the operator variable. 
-            */
+        // operator has been selected so a has a final value to use in calculations. 
+        // since a is always assigned a value before b, b should be an empty string. 
+        else if (!operands.b && operator) {
+            operands.b = number.textContent;
+            mainDisplay.textContent = number.textContent;
+        }
+        else if (operands.b && operator && !equalsSelected) {
+            operands.b += number.textContent;
+            mainDisplay.textContent += number.textContent;
         }
     });
 })
 
-// whenever an operation is performed, we need to update the display
-// to be equal to the answer here;
 function add(a, b){
     return Number(a)+Number(b);
 }
@@ -93,7 +122,6 @@ function operate(operator, a, b) {
         case '+':
             // reset operator
             operator = '';
-            console.log("in operate");
             return add(a, b);
         case '-':
             operator = '';
