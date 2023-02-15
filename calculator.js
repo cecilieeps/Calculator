@@ -1,11 +1,3 @@
-let operator;
-let equalsSelected;
-let result;
-let operands = {
-    a : '',
-    b : '',
-}
-
 const operators = document.querySelectorAll('.operator');
 const numbers = document.querySelectorAll('.number');
 const smallDisplay = document.querySelector('.small-display');
@@ -13,6 +5,14 @@ const mainDisplay = document.querySelector('.main-display');
 const equals = document.querySelector('.equals');
 const clearButton = document.querySelector('.clear');
 const delButton = document.querySelector('.delete');
+
+let operator;
+let equalsSelected;
+let result;
+let operands = {
+    a : '',
+    b : '',
+}
 
 clearButton.addEventListener('click', () => {
     mainDisplay.textContent = '';
@@ -22,14 +22,18 @@ clearButton.addEventListener('click', () => {
 });
 
 equals.addEventListener('click', () => {
-    if (operands.a && operands.b && operator) {
+    if (operands.b == '0' && operator === '÷') {
+        result = operate(operator, operands.a, operands.b);
+        operator = '÷'; // update since operate() re-sets variable to empty string
+    }
+    else if (operands.a && operands.b && operator) {
+        result = operate(operator, operands.a, operands.b);
+        equalsSelected = true;
         smallDisplay.textContent += operands.b;
         smallDisplay.textContent += '=';
-        result = operate(operator, operands.a, operands.b);
         mainDisplay.textContent = result;
+        operands.a = result;
     }
-    equalsSelected = true;
-    operands.a = result;
     operands.b = '';
 });
 
@@ -37,31 +41,33 @@ operators.forEach(o => {
     o.addEventListener('click', () => {
         let newOperator = o.textContent;
         if (operator) {
-            // if a and b are both assigned values and an operator is already selected,
-            // then calculate the new value for a user operate() and initialize b. 
+            /* if a and b are both assigned values and an operator is already selected,
+            then calculate the new value for a user operate() and initialize b. 
+            */
             if (operands.a && operands.b) {
                 operands.a = operate(operator, operands.a, operands.b); // operator initialized
                 operands.b = '';
-                smallDisplay.textContent = operands.a;
-                mainDisplay.textContent = operands.a;
-                smallDisplay.textContent += newOperator;
-                operator = newOperator;
             }
-            // a result has been returned using equals, and the user wants to use the result
-            // in the next calculation. 
-            else if (operands.a && !operands.b && equalsSelected) {
-                smallDisplay.textContent = operands.a;
-                mainDisplay.textContent = operands.a;
-                smallDisplay.textContent += newOperator;
-                operator = newOperator;
-            }
+            smallDisplay.textContent = operands.a;
+            smallDisplay.textContent += newOperator;
+            mainDisplay.textContent = operands.a;
+            operator = newOperator;
         }
         else if (!operator) {
             operator = newOperator;
+            if (!operands.a) {
+                operands.a = '0';
+                smallDisplay.textContent = operands.a;
+            }
+            /* if equals has been selected then b is an empty string and a has some 
+            value (the result of previous operation). When a new operator is chosen 
+            on the previous result, then change the small display to contain the 
+            previous result with the new operator. 
+            */
             if (operands.a && equalsSelected) {
                 smallDisplay.textContent = operands.a + operator;
             }
-            else if (operands.a && !operands.b) {
+            else if (operands.a && !operands.b && !equalsSelected) {
                 smallDisplay.textContent += operator;
             }
         }
@@ -75,25 +81,33 @@ function updateDisplay(x) {
 
 numbers.forEach(number => {
     number.addEventListener('click', () => {
-        // a is an empty string meaning a hasn't been selected yet
         if (!operands.a) {
             operands.a = number.textContent;
             mainDisplay.textContent = number.textContent;
             smallDisplay.textContent = number.textContent;
         }
-        // A one-digit value has been selected for a but an operator has not
-        // yet been chosen. Add another number (as string) to the value of a.
+        else if (operands.a && equalsSelected) {
+            smallDisplay.textContent = number.textContent;
+            mainDisplay.textContent = number.textContent;
+            operands.a = number.textContent;
+        }
+        /* A one-digit value has been selected for a but an operator has not
+        yet been chosen. Add another number (as string) to the value of a.
+        */
         else if (operands.a && !operator) {
             operands.a += number.textContent;
             mainDisplay.textContent += number.textContent;
             smallDisplay.textContent += number.textContent;
         }
-        // operator has been selected so a has a final value to use in calculations. 
-        // since a is always assigned a value before b, b should be an empty string. 
+        /* operator has been selected so a has a final value to use in calculations. 
+        since a is always assigned a value before b, b should be an empty string. 
+        */
         else if (!operands.b && operator) {
             operands.b = number.textContent;
             mainDisplay.textContent = number.textContent;
         }
+        /* equals hasn't yet been selected so we are adding strings to the value of b.
+        */
         else if (operands.b && operator && !equalsSelected) {
             operands.b += number.textContent;
             mainDisplay.textContent += number.textContent;
@@ -114,7 +128,10 @@ function multiply(a, b){
 }
 
 function divide(a, b){
-    return a/b;
+    if (b == '0') {
+        alert('ERROR: You cannot divide by 0!');
+    }
+    else { return a/b; }
 }
 
 function operate(operator, a, b) {
