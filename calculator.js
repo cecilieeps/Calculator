@@ -14,6 +14,8 @@ let operands = {
     b : '',
 }
 
+//WHEN WE CLICK ON A NUMBER RIGHT AFTER EQUALS, a IS ONLY ABLE TO HAVE ONE DIGIT
+
 clearButton.addEventListener('click', () => {
     mainDisplay.textContent = '';
     smallDisplay.textContent = '';
@@ -81,23 +83,28 @@ function updateDisplay(x) {
 
 numbers.forEach(number => {
     number.addEventListener('click', () => {
-        if (!operands.a) {
-            operands.a = number.textContent;
-            mainDisplay.textContent = number.textContent;
-            smallDisplay.textContent = number.textContent;
-        }
-        else if (operands.a && equalsSelected) {
+        if (operands.a && equalsSelected) {
+            console.log('im here too');
             smallDisplay.textContent = number.textContent;
             mainDisplay.textContent = number.textContent;
             operands.a = number.textContent;
+            operator = '';
+            console.log(operands.a);
+            equalsSelected = false;
         }
         /* A one-digit value has been selected for a but an operator has not
         yet been chosen. Add another number (as string) to the value of a.
         */
         else if (operands.a && !operator) {
+            console.log('im here');
             operands.a += number.textContent;
             mainDisplay.textContent += number.textContent;
             smallDisplay.textContent += number.textContent;
+        }
+        else if (!operands.a) {
+            operands.a = number.textContent;
+            mainDisplay.textContent = number.textContent;
+            smallDisplay.textContent = number.textContent;
         }
         /* operator has been selected so a has a final value to use in calculations. 
         since a is always assigned a value before b, b should be an empty string. 
@@ -109,7 +116,10 @@ numbers.forEach(number => {
         /* equals hasn't yet been selected so we are adding strings to the value of b.
         */
         else if (operands.b && operator && !equalsSelected) {
-            operands.b += number.textContent;
+            if (operands.b == 0) {
+                operands.b = number.textContent;
+            }
+            else { operands.b += number.textContent; }
             mainDisplay.textContent += number.textContent;
         }
     });
