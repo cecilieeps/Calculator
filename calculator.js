@@ -14,7 +14,17 @@ let operands = {
     b : '',
 }
 
-//WHEN WE CLICK ON A NUMBER RIGHT AFTER EQUALS, a IS ONLY ABLE TO HAVE ONE DIGIT
+// removes characters from the main display.
+// we also have to remove the number from either a or b
+delButton.addEventListener('click', () => {
+    mainDisplay.textContent = mainDisplay.textContent.slice(0, -1);
+    if (!operator) {
+        operands.a = operands.a.slice(0, -1);
+    }
+    else if (operator) {
+        operands.b = operands.b.slice(0, -1);
+    }
+});
 
 clearButton.addEventListener('click', () => {
     mainDisplay.textContent = '';
@@ -29,10 +39,12 @@ equals.addEventListener('click', () => {
         operator = '÷'; // update since operate() re-sets variable to empty string
     }
     else if (operands.a && operands.b && operator) {
-        result = operate(operator, operands.a, operands.b);
+        // the number of decimal numbers should be max 4.
+        // there should be no trailing 0's.
+        result = operate(operator, operands.a, operands.b).toFixed(5);
         equalsSelected = true;
-        smallDisplay.textContent += operands.b;
-        smallDisplay.textContent += '=';
+        smallDisplay.textContent += ' ' + operands.b + ' ';
+        smallDisplay.textContent += ' = ';
         mainDisplay.textContent = result;
         operands.a = result;
     }
@@ -84,7 +96,6 @@ function updateDisplay(x) {
 numbers.forEach(number => {
     number.addEventListener('click', () => {
         if (operands.a && equalsSelected) {
-            console.log('im here too');
             smallDisplay.textContent = number.textContent;
             mainDisplay.textContent = number.textContent;
             operands.a = number.textContent;
@@ -96,7 +107,6 @@ numbers.forEach(number => {
         yet been chosen. Add another number (as string) to the value of a.
         */
         else if (operands.a && !operator) {
-            console.log('im here');
             operands.a += number.textContent;
             mainDisplay.textContent += number.textContent;
             smallDisplay.textContent += number.textContent;
