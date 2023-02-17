@@ -14,8 +14,6 @@ let operands = {
     b : '',
 }
 
-// removes characters from the main display.
-// we also have to remove the number from either a or b
 delButton.addEventListener('click', () => {
     mainDisplay.textContent = mainDisplay.textContent.slice(0, -1);
     if (!operator) {
@@ -36,12 +34,15 @@ clearButton.addEventListener('click', () => {
 equals.addEventListener('click', () => {
     if (operands.b == '0' && operator === '÷') {
         result = operate(operator, operands.a, operands.b);
-        operator = '÷'; // update since operate() re-sets variable to empty string
+        operator = '÷'; // update since operate() sets variable to empty string
     }
+    // equals button should only do an action if all global variables
+    // have values
     else if (operands.a && operands.b && operator) {
-        // the number of decimal numbers should be max 4.
-        // there should be no trailing 0's.
-        result = operate(operator, operands.a, operands.b).toFixed(5);
+        result = operate(operator, operands.a, operands.b);
+        if (result.toString().indexOf('.') > -1) {
+            result = result.toFixed(4);
+        }
         equalsSelected = true;
         smallDisplay.textContent += ' ' + operands.b + ' ';
         smallDisplay.textContent += ' = ';
