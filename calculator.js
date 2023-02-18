@@ -5,6 +5,7 @@ const mainDisplay = document.querySelector('.main-display');
 const equals = document.querySelector('.equals');
 const clearButton = document.querySelector('.clear');
 const delButton = document.querySelector('.delete');
+const decimal = document.querySelector('.decimal');
 
 let operator;
 let equalsSelected;
@@ -13,6 +14,38 @@ let operands = {
     a : '',
     b : '',
 }
+
+/* WHAT IF TREAT A AND B AS VALUES. IF A IS NOT EMPTY (NULL) THEN WE TAKE THE CURRENT VALUE, MULTIPLY IT BY 10 AND ADD THE NUMBER PRESSED.
+E.G. 2 -> PRESS ON 3 -> 2 * 10 + 3 -> 23.
+PRESS ON 4 -> 23 * 10 + 4.
+*/
+
+decimal.addEventListener('click', () => {
+    // a is equal to a previous result
+    if (operands.a && equalsSelected) {
+        operands.a = '0.';
+        smallDisplay.textContent = '';
+        mainDisplay.textContent = operands.a;
+    }
+    else if (!operands.a) {
+        operands.a += '0.';
+        smallDisplay.textContent += '0.';
+        mainDisplay.textContent += '0.';
+    }
+    else if (operands.a && !operator) {
+        smallDisplay.textContent += '.';
+        mainDisplay.textContent += '.';
+        operands.a += '.';
+    }
+    else if (!operands.b) {
+        operands.b += '0.';
+        mainDisplay.textContent = operands.b;
+    }
+    else if (operands.b) {
+        operands.b += '.';
+        mainDisplay.textContent = operands.b;
+    }
+});
 
 delButton.addEventListener('click', () => {
     mainDisplay.textContent = mainDisplay.textContent.slice(0, -1);
@@ -25,7 +58,7 @@ delButton.addEventListener('click', () => {
 });
 
 clearButton.addEventListener('click', () => {
-    mainDisplay.textContent = '';
+    mainDisplay.textContent = '0';
     smallDisplay.textContent = '';
     operands.a = '';
     operands.b = '';
@@ -44,8 +77,7 @@ equals.addEventListener('click', () => {
             result = result.toFixed(4);
         }
         equalsSelected = true;
-        smallDisplay.textContent += ' ' + operands.b + ' ';
-        smallDisplay.textContent += ' = ';
+        smallDisplay.textContent += ' ' + operands.b + ' ' + '=';
         mainDisplay.textContent = result;
         operands.a = result;
     }
@@ -97,11 +129,10 @@ function updateDisplay(x) {
 numbers.forEach(number => {
     number.addEventListener('click', () => {
         if (operands.a && equalsSelected) {
-            smallDisplay.textContent = number.textContent;
-            mainDisplay.textContent = number.textContent;
-            operands.a = number.textContent;
+            smallDisplay.textContent += number.textContent;
+            mainDisplay.textContent += number.textContent;
+            operands.a += number.textContent;
             operator = '';
-            console.log(operands.a);
             equalsSelected = false;
         }
         /* A one-digit value has been selected for a but an operator has not
@@ -121,16 +152,13 @@ numbers.forEach(number => {
         since a is always assigned a value before b, b should be an empty string. 
         */
         else if (!operands.b && operator) {
-            operands.b = number.textContent;
-            mainDisplay.textContent = number.textContent;
+            operands.b += number.textContent;
+            mainDisplay.textContent = operands.b;
         }
         /* equals hasn't yet been selected so we are adding strings to the value of b.
         */
         else if (operands.b && operator && !equalsSelected) {
-            if (operands.b == 0) {
-                operands.b = number.textContent;
-            }
-            else { operands.b += number.textContent; }
+            operands.b += number.textContent;
             mainDisplay.textContent += number.textContent;
         }
     });
