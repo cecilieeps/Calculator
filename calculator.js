@@ -28,7 +28,10 @@ changeSign.addEventListener('click', () => {
     smallDisplay.textContent = a;
     if (b) {
         mainDisplay.textContent = b;
-        smallDisplay.textContent = a + operator + b;
+        if (Number(b) < 0) {
+            smallDisplay.textContent = a + operator + `(${b})`;
+        }
+        else { smallDisplay.textContent = a + operator + b; }
     }
 
 })
