@@ -1,29 +1,66 @@
+body {
+    background-image: linear-gradient( 268.6deg, rgb(238, 193, 226) 35.7%, rgba(204,202,251,1) 80.2% );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 700px;
+}
+
 .display {
-    margin: 5px 5px;
+    background-color: rgb(216, 216, 246);
     display: flex;
     flex-direction: column;
-    border: 1px solid rgb(170, 127, 222);
-    border-radius: 15px;
-    height: 50px;
+    height: 170px;
     align-items: flex-end;
-    justify-content: space-between;
-    padding: 5px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px 20px 0 0;
+    font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 .small-display {
     font-size: 16px;
+    margin: 15px;
+    text-align: center;
+    color: white;
 }
 
 .main-display {
     font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    font-style: italic;
+    color: white;
 }
 
-.container {
+.calculator-container {
+    background-color: rgb(255, 255, 255);
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    max-width: 250px;
     flex-wrap: wrap;
+    border-radius: 30px;
+}
+
+.buttons-container {
+    padding: 25px 25px 60px 25px;
+    width: 270px;
+}
+
+button {
+    background-color: rgb(255, 255, 255);
+    color: rgb(155, 155, 155);
+    border: none;
+    height: 40px;
+    width: 40px;
+    margin: 12px;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: lighter;
+}
+
+button:hover {
+    background-color: rgb(204,202,251,1);
+    color: white;
 }
 
 .button-row {
@@ -31,9 +68,37 @@
     justify-content: space-between;
 }
 
-.button-row > * {
-    height: 50px;
-    width: 50px;
-    margin: 5px 5px;
-    border-radius: 50%;
+.button-row > button,
+.zero-and-decimal > button,
+.equals-container > button {
+    box-shadow: 0 5px 3px rgba(0,0,0,0.2);
 }
+
+.last-button-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.equals-container{
+    width: 55%;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.equals-container > * {
+    width: 100%;
+    height: 80%;
+    text-align: center;
+    justify-content: center;
+    border-radius: 15px;
+    background-color: rgb(216, 216, 246);
+}
+
+.zero-and-decimal {
+    display: inline-block;
+    width: 60%;
+}
+
+
+
