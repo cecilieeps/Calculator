@@ -6,15 +6,36 @@ const equals = document.querySelector('.equals');
 const clearButton = document.querySelector('.clear');
 const delButton = document.querySelector('.delete');
 const decimal = document.querySelector('.decimal');
+const changeSign = document.querySelector('.sign');
 
 let result;
 let operator;
 let a = null;
 let b = null;
 
-decimal.addEventListener('click', () => {
+changeSign.addEventListener('click', () => {
     if (result) {
         a = result;
+        result = null;
+    }
+    if (a && a !== '0' && !operator) {
+        a = multiply(a, -1);
+    }
+    else if (b && b !== '0') {
+        b = multiply(b, -1);
+    }
+    mainDisplay.textContent = a;
+    smallDisplay.textContent = a;
+    if (b) {
+        mainDisplay.textContent = b;
+        smallDisplay.textContent = a + operator + b;
+    }
+
+})
+
+decimal.addEventListener('click', () => {
+    if (result) {
+        result = null;
     }
     if(!a) {
         a = '0.';
@@ -34,7 +55,16 @@ decimal.addEventListener('click', () => {
         mainDisplay.textContent = b;
         smallDisplay.textContent = a + operator + b;
     }
+    disableDecimalBtn();
 });
+
+function disableDecimalBtn() {
+    decimal.disabled = true;
+}
+
+function enableDecimalBtn() {
+    decimal.disabled = false;
+}
 
 delButton.addEventListener('click', () => {
     if (a && !operator && !b) {
@@ -66,28 +96,31 @@ clearButton.addEventListener('click', () => {
 
 equals.addEventListener('click', () => {
     if (b == 0 && operator === '÷') {
-        result = operate(operator, a, b); // gives alert
+        result = operate(operator, a, b);
     }
     else if (a && b && operator) {
         console.log(b);
         result = operate(operator, a, b);
+        /*
         let decimalIndex = result.toString().indexOf('.');
         let zeroIndex = result.toString().indexOf('0');
-        // check if there are 0s after the decimal point
+
         if (decimalIndex < zeroIndex) {
             result = result.toString().slice(0, zeroIndex);
         }
-        else { result = result.toFixed(8); }
+        */
         smallDisplay.textContent += '=';
         mainDisplay.textContent = result;
         a = null;
         b = null;
         operator = null;
     }
+    enableDecimalBtn();
 });
 
 operators.forEach(o => {
     o.addEventListener('click', () => {
+        enableDecimalBtn();
         let newOperator = o.textContent;
         if (result) {
             a = result;
@@ -116,7 +149,13 @@ numbers.forEach(number => {
             a = null;
             result = null;
         }
-        if (!a && numAsString != 0) {
+        if (!a) {
+            a = numAsString;
+        }
+        else if (a === '0' && numAsString == 0) {
+            a += '';
+        }
+        else if (a === '0' && numAsString != 0) {
             a = numAsString;
         }
         else if (a && !operator) {
@@ -125,19 +164,25 @@ numbers.forEach(number => {
         else if (a && operator === '÷' && !b && numAsString == 0) {
             alert('You cannot divide by 0!');
         }
-        else if (a && operator && !b) {
+
+        if (a && operator && !b) {
+            b = numAsString;
+        }
+        else if (b === '0' && numAsString == 0) {
+            b += '';
+        }
+        else if (b === '0' && numAsString != 0) {
             b = numAsString;
         }
         else if (a && operator && b) {
-            if (b == 0) {
-                b = numAsString;
-            }
-            else { b += numAsString; }
+            b += numAsString;
         }
         mainDisplay.textContent = a;
         smallDisplay.textContent = a;
-        if (b) {
-            console.log(operator);
+        if (operator && !b) {
+            smallDisplay.textContent = a + operator;
+        }
+        else if (b) {
             smallDisplay.textContent = a + operator + b;
             mainDisplay.textContent = b;
         }
