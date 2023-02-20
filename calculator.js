@@ -7,159 +7,139 @@ const clearButton = document.querySelector('.clear');
 const delButton = document.querySelector('.delete');
 const decimal = document.querySelector('.decimal');
 
-let operator;
-let equalsSelected;
 let result;
-let operands = {
-    a : '',
-    b : '',
-}
-
-/* WHAT IF TREAT A AND B AS VALUES. IF A IS NOT EMPTY (NULL) THEN WE TAKE THE CURRENT VALUE, MULTIPLY IT BY 10 AND ADD THE NUMBER PRESSED.
-E.G. 2 -> PRESS ON 3 -> 2 * 10 + 3 -> 23.
-PRESS ON 4 -> 23 * 10 + 4.
-*/
+let operator;
+let a = null;
+let b = null;
 
 decimal.addEventListener('click', () => {
-    // a is equal to a previous result
-    if (operands.a && equalsSelected) {
-        operands.a = '0.';
-        smallDisplay.textContent = '';
-        mainDisplay.textContent = operands.a;
+    if (result) {
+        a = result;
     }
-    else if (!operands.a) {
-        operands.a += '0.';
-        smallDisplay.textContent += '0.';
-        mainDisplay.textContent += '0.';
+    if(!a) {
+        a = '0.';
     }
-    else if (operands.a && !operator) {
-        smallDisplay.textContent += '.';
-        mainDisplay.textContent += '.';
-        operands.a += '.';
+    else if(a && !operator && !b) {
+        a = a.toString() + '.';
     }
-    else if (!operands.b) {
-        operands.b += '0.';
-        mainDisplay.textContent = operands.b;
+    else if (operator && !b) {
+        b = '0.';
     }
-    else if (operands.b) {
-        operands.b += '.';
-        mainDisplay.textContent = operands.b;
+    else if (b) {
+        b = b.toString() + '.';
+    }
+    mainDisplay.textContent = a;
+    smallDisplay.textContent = a;
+    if (b) {
+        mainDisplay.textContent = b;
+        smallDisplay.textContent = a + operator + b;
     }
 });
 
 delButton.addEventListener('click', () => {
-    mainDisplay.textContent = mainDisplay.textContent.slice(0, -1);
-    if (!operator) {
-        operands.a = operands.a.slice(0, -1);
+    if (a && !operator && !b) {
+        a = a.toString().slice(0, -1);
+        mainDisplay.textContent = a;
+        smallDisplay.textContent = a;
     }
-    else if (operator) {
-        operands.b = operands.b.slice(0, -1);
+    else if (a && operator) {
+        b = b.toString().slice(0, -1);
+        smallDisplay.textContent = a + operator + b;
+        mainDisplay.textContent = b;
+    }
+    else if (result) {
+        a = null;
+        b = null;
+        operator = null;
+        mainDisplay.textContent = 0;
+        smallDisplay.textContent = '';
     }
 });
 
 clearButton.addEventListener('click', () => {
     mainDisplay.textContent = '0';
     smallDisplay.textContent = '';
-    operands.a = '';
-    operands.b = '';
+    a = null;
+    b = null;
+    operator = null;
 });
 
 equals.addEventListener('click', () => {
-    if (operands.b == '0' && operator === '÷') {
-        result = operate(operator, operands.a, operands.b);
-        operator = '÷'; // update since operate() sets variable to empty string
+    if (b == 0 && operator === '÷') {
+        result = operate(operator, a, b); // gives alert
     }
-    // equals button should only do an action if all global variables
-    // have values
-    else if (operands.a && operands.b && operator) {
-        result = operate(operator, operands.a, operands.b);
-        if (result.toString().indexOf('.') > -1) {
-            result = result.toFixed(4);
+    else if (a && b && operator) {
+        console.log(b);
+        result = operate(operator, a, b);
+        let decimalIndex = result.toString().indexOf('.');
+        let zeroIndex = result.toString().indexOf('0');
+        // check if there are 0s after the decimal point
+        if (decimalIndex < zeroIndex) {
+            result = result.toString().slice(0, zeroIndex);
         }
-        equalsSelected = true;
-        smallDisplay.textContent += ' ' + operands.b + ' ' + '=';
+        else { result = result.toFixed(8); }
+        smallDisplay.textContent += '=';
         mainDisplay.textContent = result;
-        operands.a = result;
+        a = null;
+        b = null;
+        operator = null;
     }
-    operands.b = '';
 });
 
 operators.forEach(o => {
     o.addEventListener('click', () => {
         let newOperator = o.textContent;
-        if (operator) {
-            /* if a and b are both assigned values and an operator is already selected,
-            then calculate the new value for a user operate() and initialize b. 
-            */
-            if (operands.a && operands.b) {
-                operands.a = operate(operator, operands.a, operands.b); // operator initialized
-                operands.b = '';
-            }
-            smallDisplay.textContent = operands.a;
-            smallDisplay.textContent += newOperator;
-            mainDisplay.textContent = operands.a;
+        if (result) {
+            a = result;
+        }
+        if (a && !operator) {
             operator = newOperator;
         }
-        else if (!operator) {
+        else if (a && b && operator) {
+            result = operate(operator, a, b);
             operator = newOperator;
-            if (!operands.a) {
-                operands.a = '0';
-                smallDisplay.textContent = operands.a;
-            }
-            /* if equals has been selected then b is an empty string and a has some 
-            value (the result of previous operation). When a new operator is chosen 
-            on the previous result, then change the small display to contain the 
-            previous result with the new operator. 
-            */
-            if (operands.a && equalsSelected) {
-                smallDisplay.textContent = operands.a + operator;
-            }
-            else if (operands.a && !operands.b && !equalsSelected) {
-                smallDisplay.textContent += operator;
-            }
+            a = result;
         }
-        equalsSelected = false;
+        else if (a && operator && !b) {
+            operator = newOperator;
+        }
+        smallDisplay.textContent = a + operator;
+        mainDisplay.textContent = a;
+        result = null;
     });
 });
 
-function updateDisplay(x) {
-    smallDisplay.textContent += x;
-}
-
 numbers.forEach(number => {
     number.addEventListener('click', () => {
-        if (operands.a && equalsSelected) {
-            smallDisplay.textContent += number.textContent;
-            mainDisplay.textContent += number.textContent;
-            operands.a += number.textContent;
-            operator = '';
-            equalsSelected = false;
+        let numAsString = number.textContent;
+        if (result) {
+            a = null;
+            result = null;
         }
-        /* A one-digit value has been selected for a but an operator has not
-        yet been chosen. Add another number (as string) to the value of a.
-        */
-        else if (operands.a && !operator) {
-            operands.a += number.textContent;
-            mainDisplay.textContent += number.textContent;
-            smallDisplay.textContent += number.textContent;
+        if (!a && numAsString != 0) {
+            a = numAsString;
         }
-        else if (!operands.a) {
-            operands.a = number.textContent;
-            mainDisplay.textContent = number.textContent;
-            smallDisplay.textContent = number.textContent;
+        else if (a && !operator) {
+            a += numAsString;
         }
-        /* operator has been selected so a has a final value to use in calculations. 
-        since a is always assigned a value before b, b should be an empty string. 
-        */
-        else if (!operands.b && operator) {
-            operands.b += number.textContent;
-            mainDisplay.textContent = operands.b;
+        else if (a && operator === '÷' && !b && numAsString == 0) {
+            alert('You cannot divide by 0!');
         }
-        /* equals hasn't yet been selected so we are adding strings to the value of b.
-        */
-        else if (operands.b && operator && !equalsSelected) {
-            operands.b += number.textContent;
-            mainDisplay.textContent += number.textContent;
+        else if (a && operator && !b) {
+            b = numAsString;
+        }
+        else if (a && operator && b) {
+            if (b == 0) {
+                b = numAsString;
+            }
+            else { b += numAsString; }
+        }
+        mainDisplay.textContent = a;
+        smallDisplay.textContent = a;
+        if (b) {
+            console.log(operator);
+            smallDisplay.textContent = a + operator + b;
+            mainDisplay.textContent = b;
         }
     });
 })
@@ -177,26 +157,18 @@ function multiply(a, b){
 }
 
 function divide(a, b){
-    if (b == '0') {
-        alert('ERROR: You cannot divide by 0!');
-    }
-    else { return a/b; }
+    return a/b;
 }
 
 function operate(operator, a, b) {
     switch (operator) {
         case '+':
-            // reset operator
-            operator = '';
             return add(a, b);
         case '-':
-            operator = '';
             return subtract(a, b);
         case '*':
-            operator = '';
             return multiply(a, b);
         case '÷':
-            operator = '';
             return divide(a, b);
         default:
             break;
