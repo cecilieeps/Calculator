@@ -7,11 +7,14 @@ const clearButton = document.querySelector('.clear');
 const delButton = document.querySelector('.delete');
 const decimal = document.querySelector('.decimal');
 const changeSign = document.querySelector('.sign');
+const logDisplay = document.querySelector('.log');
+
 
 let result;
 let operator;
 let a = null;
 let b = null;
+let logSize = 0;
 
 changeSign.addEventListener('click', () => {
     if (result) {
@@ -25,7 +28,7 @@ changeSign.addEventListener('click', () => {
         b = multiply(b, -1);
     }
     mainDisplay.textContent = a;
-    smallDisplay.textContent = a;
+    smallDisplay.textContent = a + operator;
     if (b) {
         mainDisplay.textContent = b;
         if (Number(b) < 0) {
@@ -98,22 +101,26 @@ clearButton.addEventListener('click', () => {
 });
 
 equals.addEventListener('click', () => {
+    if (logSize === 4) {
+        logDisplay.textContent = '';
+    }
+    let logEntry = a + operator + b + '=' + '\r\n';
     if (b == 0 && operator === '÷') {
         result = operate(operator, a, b);
     }
     else if (a && b && operator) {
-        console.log(b);
+        logSize += 1;
         result = operate(operator, a, b);
-        /*
         let decimalIndex = result.toString().indexOf('.');
-        let zeroIndex = result.toString().indexOf('0');
-
-        if (decimalIndex < zeroIndex) {
-            result = result.toString().slice(0, zeroIndex);
+        if (decimalIndex !== -1) {
+            result = result.toFixed(3);
         }
-        */
+        logEntry += result;
         smallDisplay.textContent += '=';
         mainDisplay.textContent = result;
+        logDisplay.textContent += logEntry + '\r\n';
+        logDisplay.setAttribute('style', 'white-space: pre;');
+        logDisplay.textContent += '\r\n'
         a = null;
         b = null;
         operator = null;
